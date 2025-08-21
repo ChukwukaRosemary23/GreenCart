@@ -47,7 +47,7 @@ export async function registerUserController(request,response){
 
         const verifyEmail = await sendEmail({
             sendTo : email,
-            subject : "Verify email from binkeyit",
+            subject : "Verify email from greencart",
             html : verifyEmailTemplate({
                 name,
                 url : VerifyEmailUrl
@@ -300,6 +300,13 @@ export async function forgotPasswordController(request,response) {
             forgot_password_otp : otp,
             forgot_password_expiry : new Date(expireTime).toISOString()
         })
+
+        // ADD THESE LINES HERE ⬇️
+        console.log("=== DEBUG: About to send email ===");
+        console.log("Email will be sent to:", email);
+        console.log("From address will be: GreenCart <onboarding@resend.dev>");
+        console.log("===================================");
+
 
         await sendEmail({
             sendTo : email,

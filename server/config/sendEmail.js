@@ -8,24 +8,47 @@ if(!process.env.RESEND_API){
 
 const resend = new Resend(process.env.RESEND_API);
 
+// Rate limiting variables
+let lastEmailTime = 0;
+const MIN_EMAIL_INTERVAL = 1000; // 1 second between emails
+
 const sendEmail = async({sendTo, subject, html })=>{
     try {
+        // Rate limiting check
+        const now = Date.now();
+        const timeSinceLastEmail = now - lastEmailTime;
+        
+        if (timeSinceLastEmail < MIN_EMAIL_INTERVAL) {
+            const waitTime = MIN_EMAIL_INTERVAL - timeSinceLastEmail;
+            console.log(`Rate limiting: waiting ${waitTime}ms before sending email`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+        
+        // Update last email time
+        lastEmailTime = Date.now();
+        
+        console.log(`Sending email to: ${sendTo}`);
+        console.log(`Subject: ${subject}`);
+        
         const { data, error } = await resend.emails.send({
-            from: 'GreenCart <noreply@chukwukarosemary.co.in>',
+            from: 'GreenCart <onboarding@resend.dev>',
             to: sendTo,
             subject: subject,
             html: html,
         });
 
         if (error) {
-            return console.error({ error });
+            console.error('Resend API error:', error);
+            return { success: false, error };
         }
 
-        return data
+        console.log('Email sent successfully:', data);
+        return { success: true, data };
+        
     } catch (error) {
-        console.log(error)
+        console.log('SendEmail function error:', error);
+        return { success: false, error };
     }
 }
 
 export default sendEmail
-

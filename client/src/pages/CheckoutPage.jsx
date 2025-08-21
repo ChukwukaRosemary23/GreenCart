@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
 
 const CheckoutPage = () => {
-  const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem,fetchOrder } = useGlobalContext()
+  const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem, fetchOrder } = useGlobalContext()
   const [openAddress, setOpenAddress] = useState(false)
   const addressList = useSelector(state => state.addresses.addressList)
   const [selectAddress, setSelectAddress] = useState(0)
@@ -70,6 +70,7 @@ const CheckoutPage = () => {
 
         const { data : responseData } = response
 
+        toast.dismiss() // Dismiss loading toast
         stripePromise.redirectToCheckout({ sessionId : responseData.id })
         
         if(fetchCartItem){
@@ -79,9 +80,11 @@ const CheckoutPage = () => {
           fetchOrder()
         }
     } catch (error) {
+        toast.dismiss() // Dismiss loading toast on error
         AxiosToastError(error)
     }
   }
+
   return (
     <section className='bg-blue-50'>
       <div className='container mx-auto p-4 flex flex-col lg:flex-row w-full gap-5 justify-between'>
@@ -92,10 +95,16 @@ const CheckoutPage = () => {
             {
               addressList.map((address, index) => {
                 return (
-                  <label htmlFor={"address" + index} className={!address.status && "hidden"}>
+                  <label key={index} htmlFor={"address" + index} className={!address.status ? "hidden" : ""}>
                     <div className='border rounded p-3 flex gap-3 hover:bg-blue-50'>
                       <div>
-                        <input id={"address" + index} type='radio' value={index} onChange={(e) => setSelectAddress(e.target.value)} name='address' />
+                        <input 
+                          id={"address" + index} 
+                          type='radio' 
+                          value={index} 
+                          onChange={(e) => setSelectAddress(Number(e.target.value))} 
+                          name='address' 
+                        />
                       </div>
                       <div>
                         <p>{address.address_line}</p>
@@ -113,9 +122,6 @@ const CheckoutPage = () => {
               Add address
             </div>
           </div>
-
-
-
         </div>
 
         <div className='w-full max-w-md bg-white py-4 px-2'>
@@ -125,10 +131,13 @@ const CheckoutPage = () => {
             <h3 className='font-semibold'>Bill details</h3>
             <div className='flex gap-4 justify-between ml-1'>
               <p>Items total</p>
-              <p className='flex items-center gap-2'><span className='line-through text-neutral-400'>{DisplayPriceInRupees(notDiscountTotalPrice)}</span><span>{DisplayPriceInRupees(totalPrice)}</span></p>
+              <p className='flex items-center gap-2'>
+                <span className='line-through text-neutral-400'>{DisplayPriceInNaira(notDiscountTotalPrice)}</span>
+                <span>{DisplayPriceInNaira(totalPrice)}</span>
+              </p>
             </div>
             <div className='flex gap-4 justify-between ml-1'>
-              <p>Quntity total</p>
+              <p>Quantity total</p>
               <p className='flex items-center gap-2'>{totalQty} item</p>
             </div>
             <div className='flex gap-4 justify-between ml-1'>
@@ -136,18 +145,21 @@ const CheckoutPage = () => {
               <p className='flex items-center gap-2'>Free</p>
             </div>
             <div className='font-semibold flex items-center justify-between gap-4'>
-              <p >Grand total</p>
+              <p>Grand total</p>
               <p>{DisplayPriceInNaira(totalPrice)}</p>
             </div>
           </div>
           <div className='w-full flex flex-col gap-4'>
-            <button className='py-2 px-4 bg-green-600 hover:bg-green-700 rounded text-white font-semibold' onClick={handleOnlinePayment}>Online Payment</button>
+            <button className='py-2 px-4 bg-green-600 hover:bg-green-700 rounded text-white font-semibold' onClick={handleOnlinePayment}>
+              Online Payment
+            </button>
 
-            <button className='py-2 px-4 border-2 border-green-600 font-semibold text-green-600 hover:bg-green-600 hover:text-white' onClick={handleCashOnDelivery}>Cash on Delivery</button>
+            <button className='py-2 px-4 border-2 border-green-600 font-semibold text-green-600 hover:bg-green-600 hover:text-white' onClick={handleCashOnDelivery}>
+              Cash on Delivery
+            </button>
           </div>
         </div>
       </div>
-
 
       {
         openAddress && (
