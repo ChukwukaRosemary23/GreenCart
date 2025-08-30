@@ -15,7 +15,7 @@ const HorizontalBanner = () => {
         {/* Left side - Text content */}
         <div className="flex-1">
           <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">
-            Rosemary corner
+            GreenCart corner
           </h1>
           <p className="text-sm md:text-base text-gray-600 mb-3">
             Your favourite store is now online

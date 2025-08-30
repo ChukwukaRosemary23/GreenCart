@@ -24,6 +24,12 @@ import CheckoutPage from "../pages/CheckoutPage";
 import Success from "../pages/Success";
 import Cancel from "../pages/Cancel";
 
+// NEW PAGES
+import Contact from "../pages/Contact";
+import Terms from "../pages/Terms";
+import Privacy from "../pages/Privacy";
+import Shipping from "../pages/Shipping";
+
 const router = createBrowserRouter([
     {
         path : "/",
@@ -33,6 +39,24 @@ const router = createBrowserRouter([
                 path : "",
                 element : <Home/>
             },
+            // NEW PAGES ROUTES
+            {
+                path: "contact",
+                element: <Contact/>
+            },
+            {
+                path: "terms",
+                element: <Terms/>
+            },
+            {
+                path: "privacy",
+                element: <Privacy/>
+            },
+            {
+                path: "shipping",
+                element: <Shipping/>
+            },
+            // EXISTING ROUTES
             {
                 path : "search",
                 element : <SearchPage/>
@@ -128,4 +152,4 @@ const router = createBrowserRouter([
     }
 ])
 
-export default router
+export default router;

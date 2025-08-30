@@ -20,4 +20,8 @@ productRouter.delete('/delete-product',auth,admin,deleteProductDetails)
 //search product 
 productRouter.post('/search-product',searchProduct)
 
+
+
+  
+
 export default productRouter
