@@ -70,7 +70,8 @@ const GlobalProvider = ({children}) => {
           const { data : responseData} = response
 
           if(responseData.success){
-            toast.success(responseData.message)
+            console.log("🔥 TOAST CALLED FROM GlobalProvider deleteCartItem:", responseData.message)
+            // toast.success(responseData.message)  // COMMENTED OUT FOR TESTING
             fetchCartItem()
           }
       } catch (error) {

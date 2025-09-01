@@ -14,7 +14,7 @@ const AddToCartButton = ({ data }) => {
     const cartItem = useSelector(state => state.cartItem.cart)
     const [isAvailableCart, setIsAvailableCart] = useState(false)
     const [qty, setQty] = useState(0)
-    const [cartItemDetails,setCartItemsDetails] = useState()
+    const [cartItemDetails, setCartItemsDetails] = useState()
 
     const handleADDTocart = async (e) => {
         e.preventDefault()
@@ -33,7 +33,10 @@ const AddToCartButton = ({ data }) => {
             const { data: responseData } = response
 
             if (responseData.success) {
-                toast.success(responseData.message)
+                console.log("🔥 TOAST CALLED FROM AddToCartButton:", responseData.message)
+                // toast.success(responseData.message, { 
+                //     id: `add-cart-success` // Same ID prevents duplicates
+                // })
                 if (fetchCartItem) {
                     fetchCartItem()
                 }
@@ -43,7 +46,6 @@ const AddToCartButton = ({ data }) => {
         } finally {
             setLoading(false)
         }
-
     }
 
     //checking this item in cart or not
@@ -56,31 +58,39 @@ const AddToCartButton = ({ data }) => {
         setCartItemsDetails(product)
     }, [data, cartItem])
 
-
-    const increaseQty = async(e) => {
+    const increaseQty = async (e) => {
         e.preventDefault()
         e.stopPropagation()
-    
-       const response = await  updateCartItem(cartItemDetails?._id,qty+1)
-        
-       if(response.success){
-        toast.success("Item added")
-       }
-    }
 
-    const decreaseQty = async(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        if(qty === 1){
-            deleteCartItem(cartItemDetails?._id)
-        }else{
-            const response = await updateCartItem(cartItemDetails?._id,qty-1)
-
-            if(response.success){
-                toast.success("Item remove")
-            }
+        try {
+            // updateCartItem doesn't show toast, so we can show one here
+            const response = await updateCartItem(cartItemDetails?._id, qty + 1)
+            // Remove this toast since it might be duplicating
+            // if(response.success){
+            //     toast.success("Item added")
+            // }
+        } catch (error) {
+            console.error('Error increasing quantity:', error)
         }
     }
+
+    const decreaseQty = async (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        
+        try {
+            if (qty === 1) {
+                // deleteCartItem already shows a toast in GlobalProvider
+                await deleteCartItem(cartItemDetails?._id)
+            } else {
+                // updateCartItem doesn't show a toast, so no duplicate issue here
+                await updateCartItem(cartItemDetails?._id, qty - 1)
+            }
+        } catch (error) {
+            console.error('Error decreasing quantity:', error)
+        }
+    }
+
     return (
         <div className='w-full max-w-[150px]'>
             {
@@ -98,7 +108,6 @@ const AddToCartButton = ({ data }) => {
                     </button>
                 )
             }
-
         </div>
     )
 }

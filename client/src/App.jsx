@@ -15,6 +15,34 @@ import GlobalProvider from './provider/GlobalProvider';
 import { FaCartShopping } from "react-icons/fa6";
 import CartMobileLink from './components/CartMobile';
 
+// Global duplicate prevention
+let lastToastMessage = '';
+let lastToastTime = 0;
+
+// Override toast functions to prevent duplicates
+const originalSuccess = toast.success;
+const originalError = toast.error;
+
+toast.success = (message, options = {}) => {
+  const now = Date.now();
+  if (message === lastToastMessage && now - lastToastTime < 1000) {
+    return; // Ignore duplicate within 1 second
+  }
+  lastToastMessage = message;
+  lastToastTime = now;
+  return originalSuccess(message, options);
+};
+
+toast.error = (message, options = {}) => {
+  const now = Date.now();
+  if (message === lastToastMessage && now - lastToastTime < 1000) {
+    return; // Ignore duplicate within 1 second
+  }
+  lastToastMessage = message;
+  lastToastTime = now;
+  return originalError(message, options);
+};
+
 function App() {
   const dispatch = useDispatch()
   const location = useLocation()
@@ -75,7 +103,24 @@ function App() {
           <Outlet/>
       </main>
       <Footer/>
-      <Toaster/>
+      <Toaster 
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 2000,
+          },
+          error: {
+            duration: 3000,
+          },
+        }}
+      />
       {
         location.pathname !== '/checkout' && (
           <CartMobileLink/>

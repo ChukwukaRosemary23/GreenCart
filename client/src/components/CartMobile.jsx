@@ -7,7 +7,8 @@ import { FaCaretRight } from "react-icons/fa";
 import { useSelector } from 'react-redux'
 
 const CartMobileLink = () => {
-    const { totalPrice, totalQty } = useGlobalContext()
+    const context = useGlobalContext()
+    const { totalPrice, totalQty } = context || {}
     const cartItem = useSelector(state => state.cartItem.cart)
 
   return (
