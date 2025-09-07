@@ -57,13 +57,18 @@ export const pricewithDiscount = (price,dis = 1)=>{
 
 export async function paymentController(request,response){
     try {
+        console.log("Payment controller called with:", request.body);
+        console.log("User ID from auth:", request.userId);
+        
         const userId = request.userId // auth middleware 
         const { list_items, totalAmt, addressId, subTotalAmt } = request.body 
 
         const user = await UserModel.findById(userId)
+        console.log("User found:", user?.email);
 
         // Calculate total amount in kobo (Paystack uses kobo for NGN)
         const amountInKobo = Math.round(totalAmt * 100)
+        console.log("Amount in kobo:", amountInKobo);
 
         const initializeData = {
             amount: amountInKobo,
@@ -77,8 +82,10 @@ export async function paymentController(request,response){
                 list_items: JSON.stringify(list_items)
             }
         }
+        console.log("Initializing Paystack with:", initializeData);
 
         const response_paystack = await paystackInstance.transaction.initialize(initializeData)
+        console.log("Paystack response:", response_paystack);
 
         return response.status(200).json({
             success: true,
@@ -86,6 +93,9 @@ export async function paymentController(request,response){
         })
 
     } catch (error) {
+        console.log("Payment controller error:", error);
+        console.log("Error message:", error.message);
+        console.log("Error stack:", error.stack);
         return response.status(500).json({
             message : error.message || error,
             error : true,
