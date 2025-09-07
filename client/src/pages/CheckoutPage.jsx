@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { useGlobalContext } from '../provider/GlobalProvider'
 import { DisplayPriceInNaira } from '../utils/DisplayPriceInNaira'
 import AddAddress from '../components/AddAddress'
@@ -8,7 +8,7 @@ import Axios from '../utils/Axios'
 import SummaryApi from '../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
-import { loadStripe } from '@stripe/stripe-js'
+// import { PaystackButton } from 'react-paystack'
 
 const CheckoutPage = () => {
   const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem, fetchOrder } = useGlobalContext()
@@ -16,6 +16,7 @@ const CheckoutPage = () => {
   const addressList = useSelector(state => state.addresses.addressList)
   const [selectAddress, setSelectAddress] = useState(0)
   const cartItemsList = useSelector(state => state.cartItem.cart)
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleCashOnDelivery = async() => {
@@ -54,9 +55,8 @@ const CheckoutPage = () => {
 
   const handleOnlinePayment = async()=>{
     try {
-        toast.loading("Loading...")
-        const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
-        const stripePromise = await loadStripe(stripePublicKey)
+        setLoading(true)
+        toast.loading("Initializing payment...")
        
         const response = await Axios({
             ...SummaryApi.payment_url,
@@ -70,19 +70,41 @@ const CheckoutPage = () => {
 
         const { data : responseData } = response
 
-        toast.dismiss() // Dismiss loading toast
-        stripePromise.redirectToCheckout({ sessionId : responseData.id })
+        if(responseData.success && responseData.data) {
+            toast.dismiss()
+            // Redirect to Paystack payment page
+            window.location.href = responseData.data.authorization_url
+        }
         
-        if(fetchCartItem){
-          fetchCartItem()
-        }
-        if(fetchOrder){
-          fetchOrder()
-        }
     } catch (error) {
-        toast.dismiss() // Dismiss loading toast on error
+        toast.dismiss()
+        setLoading(false)
         AxiosToastError(error)
     }
+  }
+
+  // Paystack payment success callback
+  const handlePaystackSuccess = (reference) => {
+    toast.success("Payment successful!")
+    
+    if(fetchCartItem){
+      fetchCartItem()
+    }
+    if(fetchOrder){
+      fetchOrder()
+    }
+    
+    navigate('/success', {
+      state : {
+        text : "Order"
+      }
+    })
+  }
+
+  // Paystack payment close callback
+  const handlePaystackClose = () => {
+    toast.error("Payment was cancelled")
+    setLoading(false)
   }
 
   return (
@@ -150,8 +172,12 @@ const CheckoutPage = () => {
             </div>
           </div>
           <div className='w-full flex flex-col gap-4'>
-            <button className='py-2 px-4 bg-green-600 hover:bg-green-700 rounded text-white font-semibold' onClick={handleOnlinePayment}>
-              Online Payment
+            <button 
+              className={`py-2 px-4 bg-green-600 hover:bg-green-700 rounded text-white font-semibold ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleOnlinePayment}
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Online Payment'}
             </button>
 
             <button className='py-2 px-4 border-2 border-green-600 font-semibold text-green-600 hover:bg-green-600 hover:text-white' onClick={handleCashOnDelivery}>

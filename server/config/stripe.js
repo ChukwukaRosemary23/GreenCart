@@ -1,5 +1,5 @@
-import stripe from 'stripe'
+import Paystack from 'paystack-api'
 
-const Stripe = stripe(process.env.STRIPE_SECRET_KEY )
+const paystackInstance = Paystack(process.env.PAYSTACK_SECRET_KEY)
 
-export default Stripe
+export default paystackInstance
