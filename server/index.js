@@ -17,12 +17,12 @@ import orderRouter from './route/order.route.js'
 
 const app = express()
 
-// ✅ Allow multiple frontend URLs
+// ✅ Allow multiple frontend URLs (with .trim to remove spaces/newlines)
 const allowedOrigins = process.env.FRONTEND_URLS
-  ? process.env.FRONTEND_URLS.split(",")
+  ? process.env.FRONTEND_URLS.split(",").map(url => url.trim())
   : []
 
-//  DEBUG: show which origins the server sees (remove after testing)
+// DEBUG: show which origins the server sees
 console.log("✅ Allowed origins:", allowedOrigins)
 
 app.use(
@@ -48,7 +48,6 @@ app.use(
 )
 
 const PORT = process.env.PORT || 8080
-
 
 app.get("/", (request, response) => {
   response.json({
