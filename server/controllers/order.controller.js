@@ -84,12 +84,26 @@ export async function paymentController(request,response){
         }
         console.log("Initializing Paystack with:", initializeData);
 
-        const response_paystack = await paystackInstance.transaction.initialize(initializeData)
-        console.log("Paystack response:", response_paystack);
+        // Use direct fetch instead of paystack-api package
+        const response_paystack = await fetch('https://api.paystack.co/transaction/initialize', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(initializeData)
+        });
+
+        const paystackData = await response_paystack.json();
+        console.log("Paystack response:", paystackData);
+
+        if (!response_paystack.ok) {
+            throw new Error(`Paystack API error: ${paystackData.message || 'Unknown error'}`);
+        }
 
         return response.status(200).json({
             success: true,
-            data: response_paystack.data
+            data: paystackData.data
         })
 
     } catch (error) {

@@ -16,38 +16,54 @@ import addressRouter from './route/address.route.js'
 import orderRouter from './route/order.route.js'
 
 const app = express()
-app.use(cors({
-    credentials : true,
-    origin : process.env.FRONTEND_URL
-}))
+
+// ✅ Allow multiple frontend URLs
+const allowedOrigins = process.env.FRONTEND_URLS
+  ? process.env.FRONTEND_URLS.split(",")
+  : []
+
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error("Not allowed by CORS"))
+      }
+    },
+  })
+)
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(morgan("dev"))
-app.use(helmet({
-    crossOriginResourcePolicy : false
-}))
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+)
 
-const PORT = 8080 || process.env.PORT 
+const PORT = process.env.PORT || 8080
 
-app.get("/",(request,response)=>{
-    ///server to client
-    response.json({
-        message : "Server is running " + PORT
-    })
+
+app.get("/", (request, response) => {
+  response.json({
+    message: "Server is running on " + PORT,
+  })
 })
 
-app.use('/api/user',userRouter)
-app.use("/api/category",categoryRouter)
-app.use("/api/file",uploadRouter)
-app.use("/api/subcategory",subCategoryRouter)
-app.use("/api/product",productRouter)
-app.use("/api/cart",cartRouter)
-app.use("/api/address",addressRouter)
-app.use('/api/order',orderRouter)
+app.use('/api/user', userRouter)
+app.use('/api/category', categoryRouter)
+app.use('/api/file', uploadRouter)
+app.use('/api/subcategory', subCategoryRouter)
+app.use('/api/product', productRouter)
+app.use('/api/cart', cartRouter)
+app.use('/api/address', addressRouter)
+app.use('/api/order', orderRouter)
 
-connectDB().then(()=>{
-    app.listen(PORT,()=>{
-        console.log("Server is running",PORT)
-    })
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log("✅ Server is running on port", PORT)
+  })
 })
-
