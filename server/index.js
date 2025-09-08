@@ -22,6 +22,9 @@ const allowedOrigins = process.env.FRONTEND_URLS
   ? process.env.FRONTEND_URLS.split(",")
   : []
 
+//  DEBUG: show which origins the server sees (remove after testing)
+console.log("✅ Allowed origins:", allowedOrigins)
+
 app.use(
   cors({
     credentials: true,
