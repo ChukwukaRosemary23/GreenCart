@@ -142,3 +142,32 @@ export const deleteCartItemQtyController = async(request,response)=>{
         })
     }
 }
+
+export const clearCartController = async(request, response) => {
+    try {
+        const userId = request.userId // middleware
+        
+        // Remove all items from cart
+        const deleteAllCartItems = await CartProductModel.deleteMany({ userId: userId })
+        
+        // Clear shopping cart in user model
+        const updateUser = await UserModel.updateOne(
+            { _id: userId }, 
+            { shopping_cart: [] }
+        )
+
+        return response.json({
+            message: "Cart cleared successfully",
+            error: false,
+            success: true,
+            data: deleteAllCartItems
+        })
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        })
+    }
+}

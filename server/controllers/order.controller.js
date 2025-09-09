@@ -75,7 +75,8 @@ export async function paymentController(request,response){
             email: user.email,
             currency: 'NGN',
             reference: `ORD-${new mongoose.Types.ObjectId()}`,
-            callback_url: `${process.env.FRONTEND_URL}/success`,
+            // callback_url: `${process.env.FRONTEND_URL}/success`,
+            callback_url: `${process.env.FRONTEND_URLS.split(',')[0]}/success`,
             metadata: {
                 userId: userId,
                 addressId: addressId,
