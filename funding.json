@@ -1,0 +1,50 @@
+{
+  "version": "v1.0.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Rosemary (Uche) Chukwuka",
+    "email": "chukwukarosemary2020@gmail.com",
+    "description": "Self-taught full-stack software engineer from Nigeria building open source e-commerce and fintech tools.",
+    "webpageUrl": {
+      "url": "https://www.linkedin.com/in/chukwuka-rosemary-0944b9244/"
+    }
+  },
+  "projects": [
+    {
+      "guid": "greencart",
+      "name": "GreenCart",
+      "description": "Open source full-stack e-commerce platform serving real users, featuring JWT authentication, Stripe payments, admin dashboard with role-based access control, and Cloudinary image optimization. Built with React, Node.js, Express, and MongoDB.",
+      "webpageUrl": {
+        "url": "https://spontaneous-taffy-2a390e.netlify.app"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/ChukwukaRosemary23/GreenCart"
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["ecommerce", "react", "nodejs", "mongodb", "stripe", "fullstack", "africa"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github-sponsors",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/ChukwukaRosemary23",
+        "description": "Support via GitHub Sponsors"
+      }
+    ],
+    "plans": [
+      {
+        "guid": "general-support",
+        "status": "active",
+        "name": "General Development Support",
+        "description": "Support ongoing development and maintenance of GreenCart and future open source tools.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["github-sponsors"]
+      }
+    ]
+  }
+}
